@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from models import Product
 
 
@@ -41,3 +41,27 @@ def get_product_by_id(id: int):
 def add_product(product: Product):
     products.append(product)
     return product
+
+
+@app.delete("/products/{id}")
+def delete_product(id: int):
+    try:
+        for i in range(len(products)):
+            if products[i].id == id:
+                del products[i]
+        return {"message": "Product Deleted Successfully"}
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail="delete_product---> some error occurred while deleting the product")
+
+
+@app.put("/products")
+def update_product(id: int, product: Product):
+    for i in range(len(products)):
+        if products[i].id == id:
+            products[i] = product
+            return {"message": "Product Added Successfully", "updated_product": product}
+    raise HTTPException(
+        status_code=404,
+        detail="No Product found")
